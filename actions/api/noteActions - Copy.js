@@ -12,16 +12,11 @@ class NoteAction {
         res.send('ok');
     }
 
-    async getAllNotes(req, res) {
-        try {
-            const doc = await Note.find();
-            console.log(doc);
-            res.send("Pobieranie wszystkich notatek")
-        }
-        catch (err) {
-            console.error('Błąd podczas pobierania notatek:', err);
-            res.status(500).send('Wystąpił błąd podczas pobierania notatek');
-        }
+    getAllNotes(req, res) {
+        Note.find({})
+            .then((doc) => { console.log(doc) })
+            .catch((err) => console.log(err))
+        res.send('Pobieranie wszystkich notatek')
     }
 
     getNote(req, res) {
