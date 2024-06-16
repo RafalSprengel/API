@@ -1,31 +1,49 @@
 const Note = require('../../db/models/note.js')
 
 class NoteAction {
-    saveNotes(req, res) {
+
+    async saveNote(req, res) {
         const title = req.body.title;
         const body = req.body.body;
         const newNote = new Note({
             title: title,
             body: body
         });
-        newNote.save().then(() => console.log('Zapisano nową notatkę'));
-        res.send('ok');
+        try {
+            await newNote.save();
+            console.log('Zapisano nową notatkę')
+            res.send('ok')
+        }
+        catch (err) {
+            console.error('Błąd: ', err)
+        }
+
     }
 
     async getAllNotes(req, res) {
         try {
             const doc = await Note.find();
-            console.log(doc);
-            res.send("Pobieranie wszystkich notatek")
+            res.status(200).json(doc);
         }
         catch (err) {
             console.error('Błąd podczas pobierania notatek:', err);
-            res.status(500).send('Wystąpił błąd podczas pobierania notatek');
+            res.status(500).json({ 'message': 'Wystąpił błąd podczas pobierania notatek: ', err });
         }
     }
 
-    getNote(req, res) {
-        res.send('Pobieranie jedne notatki, notatka ma numer: ' + req.params.id)
+    async getNote(req, res) {
+        const id = req.params.id
+        try {
+            const doc = await Note.findOne({ "_id": id })
+            res.status(200).json(doc)
+        }
+        catch (err) {
+            console.error('Błąd podczas pobierania notatek:', err);
+            res.status(500).json({ 'message': 'Wystąpił błąd podczas pobierania notatek: ', err });
+        }
+
+
+        res.send('Pobieranie jedne notatki, notatka ma numer: ' + id)
     }
 
     updateNote(req, res) {
